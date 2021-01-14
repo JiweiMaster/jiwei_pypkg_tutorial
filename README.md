@@ -1,6 +1,8 @@
 ## Introduction 
 1、pypi的测试服和正式服不是同一个数据库，需要注册两次账号
+
 2、pypi 存放python依赖库
+
 3、sphinx 文档自动生成工具
 
 ### 封装一些自己常用的函数，放到pypi方便直接pip安装使用
