@@ -17,14 +17,20 @@ pip install JiweiCommonUtil==0.0.3
 
 ## How to Use -- > API
 ./doc/_build/index.html
+
 from JiweiCommonUtil.imageprocess import readMatFile,cv2Bgr2Rgb
+
 from JiweiCommonUtil.imgshow import showLineImg
+
 from JiweiCommonUtil.util import getNowTime
 
 ## How to rebuild project and generate doc file
 1、edit setup.py version
+
 2、package proejct: python setup.py sdist bdist_wheel
+
 3、upload proejct to pypi server: python -m twine upload dist/*
+
 4、sphinx-apidoc -F -o ./doc ./JiweiCommonUtil
 
 
