@@ -30,10 +30,8 @@ def yolo2voc(txt_file, config:Config):
     print(os.path.join(config.label_dir, f'{txt_file[:-4]}.xml'))
     writer.save(os.path.join(config.label_dir, f'{txt_file[:-4]}.xml'))
 
-
 def voc2yolo(xml_file, config:Config):
     in_file = open(f'{config.label_dir}/{xml_file}')
-    print(in_file)
     try:
         root = xml.etree.ElementTree.parse(in_file).getroot()
     except:
@@ -47,6 +45,7 @@ def voc2yolo(xml_file, config:Config):
         if name in config.names:
             has_class = True
     if has_class:
+        print(f'{config.label_dir}/{xml_file[:-4]}.txt')
         out_file = open(f'{config.label_dir}/{xml_file[:-4]}.txt', 'w')
         for obj in root.iter('object'):
             name = obj.find('name').text
@@ -70,16 +69,19 @@ def voc2yolo(xml_file, config:Config):
                 cls_id = config.names.index(obj.find('name').text)
                 out_file.write(str(cls_id) + " " + " ".join([str(f'{a:.6f}') for a in b]) + '\n')
 
-
 def voc_yolo_convert(config:Config, f_yolo2voc = False, f_voc2yolo = False):
     '''
     voc和yolo数据格式的转化， 其中f_yolo2voc,f_voc2yolo一个是True，另外一个是False才行
+    # image_dir, label_dir, names
+    image_dir = "image_test/images"
+    label_dir = "demo_outputs"
+    names= ['door','cabinetDoor','refrigeratorDoor','window']
     '''
     if f_yolo2voc and not f_voc2yolo:
         print('YOLO to VOC')
         txt_files = [name for name in os.listdir(config.label_dir) if name.endswith('.txt')]
         with multiprocessing.Pool(os.cpu_count()) as pool:
-            pool.map(yolo2voc, txt_files)
+            pool.starmap(yolo2voc, txt_files, list(zip(xml_files, [config for i in xml_files])))
         pool.close()
         pool.join()
 
@@ -88,9 +90,10 @@ def voc_yolo_convert(config:Config, f_yolo2voc = False, f_voc2yolo = False):
         xml_files = [name for name in os.listdir(config.label_dir) if name.endswith('.xml')]
         print("Waiting transfer files: ", len(xml_files))
         with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-            pool.map(voc2yolo, xml_files)
+            pool.starmap(voc2yolo, list(zip(xml_files, [config for i in xml_files])))
         pool.close()
         pool.join()
+
 
 class YOLO2COCO:
     def __init__(self, root, split, COCO_CATEGORIES):

@@ -7,7 +7,7 @@ with open('README.md','r') as fh:
 
 setuptools.setup(
     name = 'JiweiCommonUtil',
-    version = '0.0.5',
+    version = '0.0.6',
     author = '纪伟',
     author_email = '2413914266@qq.com',
     description = '自己常用的一些包，为了使用方便封装起来传到pypi',
