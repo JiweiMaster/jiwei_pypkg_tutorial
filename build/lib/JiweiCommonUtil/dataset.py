@@ -8,6 +8,7 @@ from pascal_voc_writer import Writer
 import json
 from pathlib import Path
 from PIL import Image
+from collections import defaultdict
 
 
 class Config:
@@ -366,3 +367,62 @@ def map_score(gt_path, pred_path):
     ap50 = int(cocoEval.stats[1]*10000)
     return ap50
 
+def get_voc_classes(voc_dir):
+    '''
+    voc_dir: voc数据集的Annotations的目录
+    '''
+    # 初始化一个字典来存储类别数量
+    class_counts = defaultdict(int)
+    # 遍历Annotations目录下的XML文件
+    annotations_dir = os.path.join(voc_dir, "Annotations")
+    for filename in os.listdir(annotations_dir):
+        if filename.endswith(".xml"):
+            with open(os.path.join(annotations_dir, filename), 'r') as f:
+                for line in f:
+                    if "<name>" in line:
+                        class_name = line.strip().split(">")[1].split("<")[0]
+                        class_counts[class_name] += 1
+    # 打印每个类别的数量
+    for class_name, count in class_counts.items():
+        print(f"{class_name}: {count}")
+
+def get_yolo_classes(yolo_dir):
+    '''
+    yolo_dir的val的txt的数据目录
+    '''
+    # 初始化一个字典来存储类别数量
+    class_counts = defaultdict(int)
+    # 遍历YOLO数据集目录下的所有.txt文件
+    for filename in os.listdir(yolo_dir):
+        if filename.endswith(".txt"):
+            with open(os.path.join(yolo_dir, filename), 'r') as f:
+                for line in f:
+                    class_index = int(line.strip().split()[0])
+                    class_counts[class_index] += 1
+    # 打印每个类别的数量
+    for class_index, count in class_counts.items():
+        print(f"Class {class_index}: {count}")
+
+def get_coco_classes(coco_annotation_file):
+    '''
+    coco annotation.json的目录
+    '''
+    # 读取COCO标注文件
+    with open(coco_annotation_file, 'r') as f:
+        coco_data = json.load(f)
+    # 初始化一个字典来存储类别数量
+    class_counts = {}
+    # 获取所有类别信息
+    categories = coco_data['categories']
+    for category in categories:
+        class_id = category['id']
+        class_name = category['name']
+        class_counts[class_id] = {'name': class_name, 'count': 0}
+    # 统计每个类别的数量
+    annotations = coco_data['annotations']
+    for annotation in annotations:
+        class_id = annotation['category_id']
+        class_counts[class_id]['count'] += 1
+    # 打印每个类别的数量
+    for class_id, info in class_counts.items():
+        print(f"{info['name']}: {info['count']}")
